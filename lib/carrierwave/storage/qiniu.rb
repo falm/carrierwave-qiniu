@@ -5,7 +5,7 @@ require 'qiniu/http'
 
 module CarrierWave
   module Storage
-    class Qiniu < Abstract
+    class Qiniu < Abstrct
 
       class Connection
         def initialize(options={})
@@ -113,7 +113,6 @@ module CarrierWave
           qiniu_connection.delete(@path)
         end
 
-        #
         # @note 复制图片
         #
         # @param [BaseUploader] target_uploader
@@ -122,7 +121,6 @@ module CarrierWave
           target = target_uploader.kind_of?(BaseUploader) ? target_uploader.path : target_uploader
 
           puts "self.path #{self.path}, file_name #{target}, #{self.qiniu_bucket_domain}"
-
           ::Qiniu::Storage.delete(self.qiniu_bucket, target)
 
           ::Qiniu::Storage.copy(self.qiniu_bucket, self.path, self.qiniu_bucket, target)
