@@ -58,6 +58,11 @@ module CarrierWave
           code == 200 ? result : nil
         end
 
+        def copy(origin, target)
+          code, result, _ = ::Qiniu::Storage.copy(@qiniu_bucket, origin, @qiniu_bucket, target)
+          code == 200 ? result : nil
+        end
+
         def download_url(path)
           encode_path = URI.escape(path) #fix chinese file name, same as encodeURIComponent in js but preserve slash '/'
           primitive_url = "#{@qiniu_protocol}://#{@qiniu_bucket_domain}/#{encode_path}"
@@ -126,6 +131,16 @@ module CarrierWave
           ::Qiniu::Storage.copy(self.qiniu_bucket, self.path, self.qiniu_bucket, target)
         end
 
+        def copy_to(new_path)
+
+          # ::Qiniu::Storage.delete(@uploader.qiniu_bucket, new_path)
+          qiniu_connection.delete(new_path)
+
+          qiniu_connection.copy(@path, new_path)
+          # ::Qiniu::Storage.copy(@uploader.qiniu_bucket, @uploader.path, @uploader.qiniu_bucket, new_path)
+
+        end
+
         ##
         # Reads the contents of the file from Cloud Files
         #
@@ -177,8 +192,10 @@ module CarrierWave
 
       def store!(file)
         f = ::CarrierWave::Storage::Qiniu::File.new(uploader, uploader.store_path(uploader.filename))
-        f.store(file)
-        f
+        # f.store(file)
+        # f
+        # f.copy_to(file)
+        file.copy_to(f.path)
       end
 
       def retrieve!(identifier)
