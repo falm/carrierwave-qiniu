@@ -147,7 +147,11 @@ module CarrierWave
         end
 
         def copy_from(uploader)
+
+          qiniu_connection.delete(@path)
+
           qiniu_connection.copy(uploader.path, @path)
+
         end
 
         ##

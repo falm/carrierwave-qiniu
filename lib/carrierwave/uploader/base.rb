@@ -4,11 +4,15 @@ module CarrierWave
     class Base
       def copy_from(uploader)
         if file.blank?
-          file = ::CarrierWave::Storage::Qiniu::File.new(self, self.store_path(self.filename))
+          file = self.store!(upload.file)
           file.copy_from uploader
-        else
+        elsif file.respond_to? :copy_from
           file.copy_from uploader
         end
+      end
+
+      def copy_to(uploader)
+        file.copy_to(uploader) if file.respond_to? :copy_to
       end
     end
   end
