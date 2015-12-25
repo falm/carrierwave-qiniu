@@ -12,7 +12,7 @@ module CarrierWave
       end
 
       def copy_to(uploader)
-        file.copy_to(uploader) if file.respond_to? :copy_to
+        file.copy_to(uploader.path) if file.respond_to? :copy_to
       end
     end
   end
