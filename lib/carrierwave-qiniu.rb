@@ -2,7 +2,7 @@
 require "carrierwave-qiniu/version"
 require "carrierwave/storage/qiniu"
 require "carrierwave/qiniu/configuration"
-# require "carrierwave/uploader/proxy"
+require "carrierwave/uploader/base"
 
 # Gem.find_files('carrierwave/**/*').each { |file| require file }
 # Gem.find_files('carrierwave-qiniu/*').each { |file| require file }

@@ -136,7 +136,6 @@ module CarrierWave
         #
         #   ::Qiniu::Storage.copy(self.qiniu_bucket, self.path, self.qiniu_bucket, target)
         # end
-
         def copy_to(new_path)
 
           # ::Qiniu::Storage.delete(@uploader.qiniu_bucket, new_path)
@@ -146,7 +145,7 @@ module CarrierWave
           # ::Qiniu::Storage.copy(@uploader.qiniu_bucket, @uploader.path, @uploader.qiniu_bucket, new_path)
 
         end
-        
+
         def copy_from(uploader)
           qiniu_connection.copy(uploader.path, @path)
         end

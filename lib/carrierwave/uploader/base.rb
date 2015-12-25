@@ -1,10 +1,11 @@
 #encoding: utf-8
 module CarrierWave
   module Uploader
-    module Proxy
+    class Base
       def copy_from(uploader)
         if file.blank?
-          file = ::CarrierWave::Storage::Qiniu::File.new(self, uploader.store_path(self.filename))  
+          file = ::CarrierWave::Storage::Qiniu::File.new(self, self.store_path(self.filename))
+          file.copy_from uploader
         else
           file.copy_from uploader
         end
