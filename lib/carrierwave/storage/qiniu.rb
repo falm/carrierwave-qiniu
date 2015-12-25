@@ -5,7 +5,7 @@ require 'qiniu/http'
 
 module CarrierWave
   module Storage
-    class Qiniu < Abstrct
+    class Qiniu < Abstract
 
       class Connection
         def initialize(options={})
@@ -58,6 +58,12 @@ module CarrierWave
           code == 200 ? result : nil
         end
 
+        #
+        # @note 复制
+        # @param [String] origin
+        # @param [String] target
+        #
+        #
         def copy(origin, target)
           code, result, _ = ::Qiniu::Storage.copy(@qiniu_bucket, origin, @qiniu_bucket, target)
           code == 200 ? result : nil
@@ -118,18 +124,18 @@ module CarrierWave
           qiniu_connection.delete(@path)
         end
 
-        # @note 复制图片
+        # # @note 复制图片
+        # #
+        # # @param [BaseUploader] target_uploader
+        # #
+        # def copy(target_uploader)
+        #   target = target_uploader.kind_of?(BaseUploader) ? target_uploader.path : target_uploader
         #
-        # @param [BaseUploader] target_uploader
+        #   puts "self.path #{self.path}, file_name #{target}, #{self.qiniu_bucket_domain}"
+        #   ::Qiniu::Storage.delete(self.qiniu_bucket, target)
         #
-        def copy(target_uploader)
-          target = target_uploader.kind_of?(BaseUploader) ? target_uploader.path : target_uploader
-
-          puts "self.path #{self.path}, file_name #{target}, #{self.qiniu_bucket_domain}"
-          ::Qiniu::Storage.delete(self.qiniu_bucket, target)
-
-          ::Qiniu::Storage.copy(self.qiniu_bucket, self.path, self.qiniu_bucket, target)
-        end
+        #   ::Qiniu::Storage.copy(self.qiniu_bucket, self.path, self.qiniu_bucket, target)
+        # end
 
         def copy_to(new_path)
 
@@ -139,6 +145,10 @@ module CarrierWave
           qiniu_connection.copy(@path, new_path)
           # ::Qiniu::Storage.copy(@uploader.qiniu_bucket, @uploader.path, @uploader.qiniu_bucket, new_path)
 
+        end
+        
+        def copy_from(uploader)
+          qiniu_connection.copy(uploader.path, @path)
         end
 
         ##
@@ -192,10 +202,10 @@ module CarrierWave
 
       def store!(file)
         f = ::CarrierWave::Storage::Qiniu::File.new(uploader, uploader.store_path(uploader.filename))
-        # f.store(file)
-        # f
+        f.store(file)
+        f
         # f.copy_to(file)
-        file.copy_to(f.path)
+        # file.copy_to(f.path)
       end
 
       def retrieve!(identifier)
