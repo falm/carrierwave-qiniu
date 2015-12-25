@@ -4,7 +4,7 @@ module CarrierWave
     class Base
       def copy_from(uploader)
         if file.blank?
-          file = self.store!(upload.file)
+          file = self.store!(uploader.file)
           file.copy_from uploader
         elsif file.respond_to? :copy_from
           file.copy_from uploader
