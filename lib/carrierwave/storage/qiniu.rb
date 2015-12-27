@@ -104,6 +104,8 @@ module CarrierWave
 
       class File
 
+        include CarrierWave::Utilities::Uri
+
         def initialize(uploader, path)
           @uploader, @path = uploader, path
         end
@@ -146,11 +148,11 @@ module CarrierWave
 
         end
 
-        def copy_from(uploader)
+        def copy_from(origin_path)
 
           qiniu_connection.delete(@path)
 
-          qiniu_connection.copy(uploader.path, @path)
+          qiniu_connection.copy(origin_path, @path)
 
         end
 
@@ -171,6 +173,32 @@ module CarrierWave
 
         def size
           file_info['fsize'] || 0
+        end
+
+        ##
+        # Return file name, if available
+        #
+        # === Returns
+        #
+        # [String] file name
+        #   or
+        # [NilClass] no file name available
+        #
+        def filename(options = {})
+          # return unless file_url = url(options)
+          URI.decode(path.split('?').first).gsub(/.*\/(.*?$)/, '\1')
+        end
+
+        ##
+        # Return extension of file
+        #
+        # === Returns
+        #
+        # [String] extension of file or nil if the file has no extension
+        #
+        def extension
+          path_elements = path.split('.')
+          path_elements.last if path_elements.size > 1
         end
 
         private
@@ -205,10 +233,14 @@ module CarrierWave
 
       def store!(file)
         f = ::CarrierWave::Storage::Qiniu::File.new(uploader, uploader.store_path(uploader.filename))
-        f.store(file)
+        if file && file.copy_from_path
+          puts '*' * 30
+          # puts file.copy_from_path
+          f.copy_from file.copy_from_path
+        else
+          f.store(file)
+        end
         f
-        # f.copy_to(file)
-        # file.copy_to(f.path)
       end
 
       def retrieve!(identifier)

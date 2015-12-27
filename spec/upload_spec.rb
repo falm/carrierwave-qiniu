@@ -31,11 +31,11 @@ require 'carrierwave/processing/mini_magick'
     end
 
     def store_dir
-      "carrierwave-qiniu-spec"
+      "carrierwave-qiniu-spec/#{model.class.to_s.underscore}/#{mounted_as}/#{model.try(:id)}"
     end
 
     def filename
-      "images/#{secure_token(10)}.#{file.extension}" if original_filename.present?
+      "images/#{secure_token(10)}.#{file.try(:extension)}" if original_filename.present?
     end
 
     # See
@@ -93,5 +93,75 @@ require 'carrierwave/processing/mini_magick'
       open(photo.image.thumb.url).should_not be_nil
 
     end
+
+    it 'does copy to image' do
+
+      f = load_file("mm.jpg")
+
+      photo = Photo.new(image: f)
+
+      photo.save
+
+      photo2 = Photo.new
+
+      photo2.image = photo.image
+
+      photo2.save
+
+      puts photo2.id
+      #
+      photo.image.copy_to photo2.image
+      #
+      puts photo.image.url
+      #
+      # puts 'The image was copied to:'
+
+      puts photo2.image.url
+
+      open(photo2.image.url).should_not be_nil
+
+    end
+
+    it 'does copy assign image works' do
+      f = load_file("mm.jpg")
+
+      photo = Photo.new(image: f)
+
+      photo.save
+
+      photo2 = Photo.new
+
+      photo2.image = photo.image.file
+
+      photo2.save
+
+      puts "The image was copied assign #{photo.image.url} to #{photo2.image.url}"
+
+      expect(photo2.image.url).not_to eq(photo.image.url)
+
+      open(photo2.image.url).should_not be_nil
+
+    end
+
+    it 'does copy from image works' do
+      f = load_file("mm.jpg")
+
+      photo = Photo.new(image: f)
+
+      photo.save
+
+      photo2 = Photo.new
+
+      photo2.image.copy_from photo.image
+
+      photo2.save
+
+      puts "The image was copied from #{photo.image.url} to #{photo2.image.url}"
+
+      expect(photo2.image.url).not_to eq(photo.image.url)
+
+      open(photo2.image.url).should_not be_nil
+    end
+
   end
 end

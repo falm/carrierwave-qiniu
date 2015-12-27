@@ -13,4 +13,5 @@ group :test do
   gem 'rspec', '~> 2.11'
   gem 'mocha', '>=0.10.0'
   gem 'dotenv'
+  gem 'deep_cloneable', '~> 2.0.2'
 end
